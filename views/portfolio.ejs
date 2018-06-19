@@ -1,0 +1,51 @@
+<% include helper/head.ejs %>
+<% include helper/secondheader.ejs %>
+<header>
+    <div class="container">
+        <div id="branding">
+            <h1><span class="highlight">Alpha</span> Renovation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index">Home</a></li>
+                <li><a href="about">About</a></li>
+                <li><a href="services">Services</a></li>
+                <li class="current"><a href="portfolio">Portfolio</a></li>
+                <li><a href="contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div id="portfolio">
+    <h1><%- pageTitle %></h1>
+    <div class="wrap">
+        <div id="arrow-left" class="arrow"></div>
+        <div class="slide slide1">
+            <div class="slide-content">
+                <span>Image one</span>
+            </div>
+        </div>
+        <div class="slide slide2">
+            <div class="slide-content">
+                <span>Image two</span>
+            </div>
+        </div>
+        <div class="slide slide3">
+            <div class="slide-content">
+                <span>Image three</span>
+            </div>
+        </div>
+        <div class="slide slide4">
+            <div class="slide-content">
+                <span>Image four</span>
+            </div>
+        </div>
+        <div class="slide slide5">
+            <div class="slide-content">
+                <span>Image five</span>
+            </div>
+        </div>
+        <div id="arrow-right" class="arrow"></div>
+    </div>
+</div>
+<% include helper/footer.ejs %>

@@ -1,0 +1,74 @@
+<% include helper/head.ejs %>
+<% include helper/secondheader.ejs %>
+<header>
+    <div class="container">
+        <div id="branding">
+            <h1><span class="highlight">Alpha</span> Renovation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index">Home</a></li>
+                <li class="current"><a href="about">About</a></li>
+                <li><a href="services">Services</a></li>
+                <li><a href="portfolio">Portfolio</a></li>
+                <li><a href="contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<section id="newsletter">
+    <div class="container">
+        <h1>Check what is new in our services</h1>
+        <form>
+            <input type="email" placeholder="Enter Email...">
+            <button type="submit" class="button_1">Subscribe</button>
+        </form>
+    </div>
+</section>
+
+<section id="main">
+    <div class="container">
+        <article id="main-col">
+            <h1><%- pageTitle %></h1>
+            <p>Here, User A intends to update his favorite food.
+                However, we can see that the other user collections
+                in the database do not contain the same keys.
+                Obviously, with a document based database we could
+                create new collections on the fly if needed, which
+                is handy. But if User A needs to update a specific
+                record within his collection, it’s important to be
+                able to isolate that object</p>
+            <p>Here, User A intends to update his favorite food.
+                However, we can see that the other user collections
+                in the database do not contain the same keys.
+                Obviously, with a document based database we could
+                create new collections on the fly if needed, which
+                is handy. But if User A needs to update a specific
+                record within his collection, it’s important to be
+                able to isolate that object</p>
+        </article>
+        <aside id="sidebar">
+            <div class="dark">
+                <h3>What We Do</h3>
+                <p>
+                    Here, User A intends to update his favorite food.
+                    However, we can see that the other user collections
+                    in the database do not contain the same keys.
+                <ul>
+                    <li>
+                        Obviously, with a document based databased.
+                    </li>
+                    <li>
+                        We could create new collections on the fly.
+                    </li>
+                    <li>
+                        if needed, which is handy.
+                    </li>
+                </ul>
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+<% include helper/footer.ejs %>

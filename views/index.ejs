@@ -1,0 +1,55 @@
+<% include helper/head.ejs %>
+<% include helper/secondheader.ejs %>
+<header>
+    <div class="container">
+        <div id="branding">
+            <h1><span class="highlight">Alpha</span> Renovation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="current"><a href="index">Home</a></li>
+                <li><a href="about">About</a></li>
+                <li><a href="services">Services</a></li>
+                <li><a href="portfolio">Portfolio</a></li>
+                <li><a href="contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<section id="showcase">
+    <div class="container">
+        <h1><%- pageTitle %></h1>
+        <p>We are a professional and experienced team of craftsmen capable of delivering a variety of projects in size and nature.
+              If you have ideas for your property that you wish to turn into reality we will support you from concept to completion.
+        </p>
+    </div>
+</section>
+<section id="newsletter">
+    <div class="container">
+        <h1>What's new in our services</h1>
+        <form>
+            <input type="email" placeholder="Enter Email...">
+            <button type="submit" class="button_1">Subscribe</button>
+        </form>
+    </div>
+</section>
+<section id="services">
+    <div class="container">
+        <div class="box">
+            <img src="../public/img/general.jpg">
+            <h3>Commercial</h3>
+            <button class="button_2" id="industrial" type="button" onclick="location.href='services#industrial'">FIND OUT MORE</button>
+        </div>
+        <div class="box">
+            <img src="../public/img/bathroom.JPEG">
+            <h3>Home improvements & renovations</h3>
+            <button class="button_2" id="homerenovation" type="button" onclick="location.href='services#homerenovation'">FIND OUT MORE</button>
+        </div>
+        <div class="box">
+            <img src="../public/img/furniture.JPEG">
+            <h3>Bespoke furniture</h3>
+            <button class="button_2" id="furniture" type="button" onclick="location.href='services#furniture'">FIND OUT MORE</button>
+        </div>
+    </div>
+</section>
+<% include helper/footer.ejs %>

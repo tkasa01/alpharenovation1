@@ -1,0 +1,64 @@
+<% include helper/head.ejs %>
+<% include helper/secondheader.ejs %>
+<div class="header-second"></div>
+<header>
+    <div class="container">
+        <div id="branding">
+            <h1><span class="highlight">Alpha</span> Renovation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index">Home</a></li>
+                <li><a href="about">About</a></li>
+                <li><a href="services">Services</a></li>
+                <li><a href="portfolio">Portfolio</a></li>
+                <li class="current"><a href="contact">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<section id="main">
+    <div class="container">
+        <article id="main-col">
+            <h1><%- pageTitle %></h1>
+            <div class="contact-details">
+                <p><b>Phone Number:</b></p>
+                <p>02394586758</p>
+                <p>07523488498</p>
+                <a href="mailto:alpharenovation13@gmal.com"  id="contact">alpharenovation13@gmal.com</a>
+
+            </div>
+        </article>
+        <aside id="sidebar">
+            <div class="dark">
+                <h3>Contact Us By Email</h3>
+                <% if(errors){ %>
+                <ul>
+                    <% errors.forEach(function(error){ %>
+                        <li style="color:red"><%= error.msg %></li>
+                    <% }) %>
+                </ul>
+                <% }else{ %>
+                <li style="color:green"><%= msg.msg %></li>
+                <%}%>
+                <form class="quote" method="POST" action="/contact/send">
+                    <div>
+                        <label>Name</label><br>
+                        <input type="text" name="fullName" placeholder="Name">
+                    </div>
+                    <div>
+                        <label>Email</label><br/>
+                        <input type="email" name="email" placeholder="Email">
+                    </div>
+                    <div>
+                        <label>Message</label><br/>
+                        <textarea name="text" placeholder="Message"></textarea>
+                    </div>
+                    <button class="button_1" type="submit">Send</button>
+                </form>
+            </div>
+        </aside>
+
+    </div>
+</section>
+<% include helper/footer.ejs %>
