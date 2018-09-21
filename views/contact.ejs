@@ -24,24 +24,27 @@
             <div class="contact-details">
                 <p><b>Phone Number:</b></p>
                 <p>02394586758</p>
-                <p>07523488498</p>
+                <div id="mobphone">
+                    <p> <a  href="tel:07305769695">07305769695</a></p>
+                </div>
                 <a href="mailto:alpharenovation13@gmal.com"  id="contact">alpharenovation13@gmal.com</a>
-
             </div>
         </article>
         <aside id="sidebar">
+
             <div class="dark">
                 <h3>Contact Us By Email</h3>
-                <% if(errors){ %>
                 <ul>
-                    <% errors.forEach(function(error){ %>
-                        <li style="color:red"><%= error.msg %></li>
-                    <% }) %>
+                    <% if(flash.errors !== null && typeof flash.errors  !== 'undefined'){%>
+                        <% flash.errors.forEach(function(error){ %>
+                            <li style="color:red"><%= error.messages %></li>
+                         <% }) %>
+                    <%} if(flash.messages !== null && typeof flash.messages  !== 'undefined'){%>
+                            <p style="color:darkseagreen"><%= flash.messages %></p>
+                    <%} %>
                 </ul>
-                <% }else{ %>
-                <li style="color:green"><%= msg.msg %></li>
-                <%}%>
-                <form class="quote" method="POST" action="/contact/send">
+                <form  id="form-id" class="quote" method="POST" action="send">
+
                     <div>
                         <label>Name</label><br>
                         <input type="text" name="fullName" placeholder="Name">
@@ -54,11 +57,19 @@
                         <label>Message</label><br/>
                         <textarea name="text" placeholder="Message"></textarea>
                     </div>
-                    <button class="button_1" type="submit">Send</button>
+                    <button onclick="myFoo();" class="button_1" type="submit">Send</button>
+
                 </form>
+
             </div>
         </aside>
 
     </div>
+    <script>
+     //   function myFoo(){
+     //       alert("The message has been send!");
+      //  window.location = "back to the form url"
+      //  }
+    </script>
 </section>
 <% include helper/footer.ejs %>
