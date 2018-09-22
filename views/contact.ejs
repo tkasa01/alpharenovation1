@@ -23,7 +23,6 @@
             <h1><%- pageTitle %></h1>
             <div class="contact-details">
                 <p><b>Phone Number:</b></p>
-                <p>02394586758</p>
                 <div id="mobphone">
                     <p> <a  href="tel:07305769695">07305769695</a></p>
                 </div>
@@ -31,7 +30,6 @@
             </div>
         </article>
         <aside id="sidebar">
-
             <div class="dark">
                 <h3>Contact Us By Email</h3>
                 <ul>
@@ -40,7 +38,7 @@
                             <li style="color:red"><%= error.messages %></li>
                          <% }) %>
                     <%} if(flash.messages !== null && typeof flash.messages  !== 'undefined'){%>
-                            <p style="color:darkseagreen"><%= flash.messages %></p>
+                            <li style="color:darkseagreen"><%= flash.messages %></li>
                     <%} %>
                 </ul>
                 <form  id="form-id" class="quote" method="POST" action="send">
@@ -57,19 +55,10 @@
                         <label>Message</label><br/>
                         <textarea name="text" placeholder="Message"></textarea>
                     </div>
-                    <button onclick="myFoo();" class="button_1" type="submit">Send</button>
-
+                    <button  class="button_1" type="submit">Send</button>
                 </form>
-
             </div>
         </aside>
-
     </div>
-    <script>
-     //   function myFoo(){
-     //       alert("The message has been send!");
-      //  window.location = "back to the form url"
-      //  }
-    </script>
 </section>
 <% include helper/footer.ejs %>
