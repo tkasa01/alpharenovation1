@@ -92,83 +92,6 @@ app.get('/portfolio', function (req, res) {
         pageTitle: 'Our Portfolio'
     })
 });
-/*
-function validationForm(req) {
-    return new Promise((resolve, reject)=>{
-        req.checkBody('fullName', 'Name is Required').notEmpty();
-        req.checkBody('email', 'Email is Required').notEmpty();
-        req.checkBody('text', 'Message is Required').notEmpty();
-        let validationError = (req.validationErrors());
-        let errors = [];
-
-        if (validationError) {
-            validationError.forEach(errors => {
-                errors.push(error.messages);
-            });
-            reject(errors);
-        }else{
-            resolve();
-        }
-    });
-}
-
-app.post('/send', function (req, res) {
-    validationForm(req).then(()=>{
-        const output  = `<p>You have a new contact message</p>
-                         <h3>Contact Details</h3>
-                         <ul>
-                         <li>Name:          ${req.body.name}</li>
-                         <li>Email: email:  ${req.body.email}</li>
-                         <h3>Message</h3>
-                         <li>Message:       ${req.body.text}</li>
-                         </ul>`;
-
-        const transporter = nodemailer.createTransport({
-            host: 'box5231.bluehost.com',
-            port: 465,
-            secure: true,
-            auth: {
-                user:'request@alpharenovation.co.uk',
-                pass: 'london2014'
-            }
-        });
-        const mailOptions = {
-            from: '"Website contact" <request@alpharenovation.co.uk> ',
-            to: 'alpharenovation13@gmail.com',
-            subject: 'New message from contact from alpharenovation.co.uk',
-            html: output,
-            headers:{'My-Custom-header' : 'header value'},
-            date: new Date()
-        };
-
-        transporter.sendMail( mailOptions, function (error, message, info) {
-            if(message){
-                console.log('Message sent: %s', info.messageId);
-                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-                console.log(nodemailer.getTestMessageUrl(info));
-
-                res.render('contact_send',{
-                    flash :  {messages : message},
-                    pageTitle: 'Please get in contact with us',
-                    errors: error
-                });
-            } else{
-                res.render('contact',{
-                    flash :  {errors : error},
-                    pageTitle: 'Please get in contact with us',
-                    errors: error
-                });
-            }
-        });
-    }).catch(errors =>{
-        res.render('contact',{
-            flash :  {errors : error},
-            pageTitle: 'Please get in contact with us',
-            errors: error
-        });
-    })
-});*/
-
 
 function validationForm(req, res, next) {
 
@@ -184,8 +107,8 @@ function validationForm(req, res, next) {
                 flash:{ errors: error}
             })
         }
-       // res.render('contact_send', {
-        res.render('contact', {
+        res.render('contact_send', {
+        //res.render('contact', {
             pageTitle: 'Thank you for contacting us.',
             flash:{messages: 'Thank you for contacting us. We will get back to you as soon as we can.'}
          });
