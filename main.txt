@@ -1,0 +1,2 @@
+To open console : nodemon
+for the browser: localhost:9080
