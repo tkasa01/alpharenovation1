@@ -50,4 +50,5 @@ module.exports = function() { //app was before
             pageTitle: 'Our Portfolio'
         })
     });
+
 };
