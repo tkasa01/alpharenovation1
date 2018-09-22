@@ -1,33 +1,52 @@
-/**
- * Created by tkasa on 14/06/2018.
- */
-var express = require('express');
-var bodyParser = require('body-parser');
-var path  = require('path');
-var expressValidator = require('express-validator');
-var nodemailer = require('nodemailer');
+const express = require('express');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const flash = require('connect-flash');
+const path  = require('path');
+const Promise = require('promise');
+const expressValidator = require('express-validator');
 
-const port = 9080;
-var app = express();
-//var api = require('./api/router');
+const nodemailer = require('nodemailer');
+
+
+const $ = require("jquery");
+
+const PORT = process.env.PORT || 9080;
+const app = express();
+
 
 app.locals.siteTitle = 'Alpha Renovation';
 
+app.engine('ejs', require('ejs').renderFile);
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views')); //'./views
+
+app.use(cookieParser('bordeyltd'));
+app.use(session({
+    cookie: {maxAge: 6000},
+    secret: 'secr6783',
+    saveUninitialized: true,
+    resave: true
+}));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
 app.use(function (req, res, next) {
-    res.locals.errors = null;
+    res.locals.flash = {
+        messages :req.flash('messages'),
+        errors: req.flash('errors')
+    };
     next();
 });
 
 //express validator
 app.use(expressValidator({
-    errorFormatter:function (param, msg, value){
-        var namespace = param.split('.'),
+    errorFormatter:function (param, message, error, value){
+        let namespace = param.split('.'),
             root = namespace.shift(),
             formParam = root;
         while(namespace.length){
@@ -35,11 +54,13 @@ app.use(expressValidator({
         }
         return{
             param: formParam,
-            msg: msg,
+            messages: message,
+            errors: error,
             value: value
         };
     }
 }));
+
 
 app.get('/index', function (req, res) {
    res.render('index',{
@@ -60,9 +81,10 @@ app.get('/services', function (req, res) {
 });
 
 app.get('/contact', function (req, res) {
-    res.render('contact',{
-        pageTitle: 'Please get in contact with us'
-    });
+        res.render('contact',{
+            pageTitle: 'Please get in contact with us'
+        });
+
 });
 
 app.get('/portfolio', function (req, res) {
@@ -70,60 +92,157 @@ app.get('/portfolio', function (req, res) {
         pageTitle: 'Our Portfolio'
     })
 });
+/*
+function validationForm(req) {
+    return new Promise((resolve, reject)=>{
+        req.checkBody('fullName', 'Name is Required').notEmpty();
+        req.checkBody('email', 'Email is Required').notEmpty();
+        req.checkBody('text', 'Message is Required').notEmpty();
+        let validationError = (req.validationErrors());
+        let errors = [];
 
-function validationForm(req, res, next) {
-    req.checkBody('fullName', 'Name is Required').notEmpty();
-    req.checkBody('email', 'Email is Required').notEmpty();
-    req.checkBody('text', 'Message is Required').notEmpty();
-    var errors = req.validationErrors();
-    if (errors) {
-        res.render('contact', {
-            pageTitle: 'Please get in contact with us',
-            errors: errors
-        })
-    }  res.render('contact', {
-        pageTitle: 'Please get in contact with us',
-        errors: errors,
-        msg: msg
-    })
-
-
+        if (validationError) {
+            validationError.forEach(errors => {
+                errors.push(error.messages);
+            });
+            reject(errors);
+        }else{
+            resolve();
+        }
+    });
 }
-app.post('/contact/send', validationForm, function (req, res) {
-        var newUser = {
-            fullName: req.body.fullName,
-            email: req.body.email,
-            text: req.body.text
-        };
 
-        var transporter = nodemailer.createTransport({
-            //host: 'mail.alpharenovation.co.uk',
-            host: 'smtp.gmail.com',
-            // port: 587,
+app.post('/send', function (req, res) {
+    validationForm(req).then(()=>{
+        const output  = `<p>You have a new contact message</p>
+                         <h3>Contact Details</h3>
+                         <ul>
+                         <li>Name:          ${req.body.name}</li>
+                         <li>Email: email:  ${req.body.email}</li>
+                         <h3>Message</h3>
+                         <li>Message:       ${req.body.text}</li>
+                         </ul>`;
+
+        const transporter = nodemailer.createTransport({
+            host: 'box5231.bluehost.com',
             port: 465,
             secure: true,
             auth: {
-                user: 'alpharenovation13@gmail.com',
+                user:'request@alpharenovation.co.uk',
                 pass: 'london2014'
             }
-            //tls: {rejectUnauthorized: true}
         });
-        var mailOptions = {
-            from: req.body.fullName + ' ' + req.body.email + ' ' + req.body.email,
+        const mailOptions = {
+            from: '"Website contact" <request@alpharenovation.co.uk> ',
             to: 'alpharenovation13@gmail.com',
             subject: 'New message from contact from alpharenovation.co.uk',
-            text: req.body.text
-            // text: `${req.body.name} (${req.body.email}) says: ${req.body.text}`
+            html: output,
+            headers:{'My-Custom-header' : 'header value'},
+            date: new Date()
         };
 
+        transporter.sendMail( mailOptions, function (error, message, info) {
+            if(message){
+                console.log('Message sent: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                console.log(nodemailer.getTestMessageUrl(info));
 
-    transporter.sendMail( mailOptions, function (error, info) {
-        if(error){
-            return console.log(error)
+                res.render('contact_send',{
+                    flash :  {messages : message},
+                    pageTitle: 'Please get in contact with us',
+                    errors: error
+                });
+            } else{
+                res.render('contact',{
+                    flash :  {errors : error},
+                    pageTitle: 'Please get in contact with us',
+                    errors: error
+                });
+            }
+        });
+    }).catch(errors =>{
+        res.render('contact',{
+            flash :  {errors : error},
+            pageTitle: 'Please get in contact with us',
+            errors: error
+        });
+    })
+});*/
+
+
+function validationForm(req, res, next) {
+
+         req.checkBody('fullName', 'Name is Required').notEmpty();
+         req.checkBody('email', 'Email is Required').notEmpty();
+         req.checkBody('text', 'Message is Required').notEmpty();
+
+        let error = (req.validationErrors());
+
+        if (error) {
+            res.render('contact', {
+                pageTitle: 'Please get in contact with us',
+                flash:{ errors: error}
+            })
         }
-        console.log('Message sent: %s', info.messageId);
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-        res.render('contact',{msg: "email"})
+       // res.render('contact_send', {
+        res.render('contact', {
+            pageTitle: 'Thank you for contacting us.',
+            flash:{messages: 'Thank you for contacting us. We will get back to you as soon as we can.'}
+         });
+
+        next();
+}
+
+app.post('/send', validationForm, function (req, res) {
+
+        const output  = `<p>You have a new contact message</p>
+                         <h3>Contact Details</h3>
+                         <ul>
+                         <li>Name:          ${req.body.name}</li>
+                         <li>Email: email:  ${req.body.email}</li>
+                         <h3>Message</h3>
+                         <li>Message:       ${req.body.text}</li>
+                         </ul>`;
+
+
+        const transporter = nodemailer.createTransport({
+            host: 'box5231.bluehost.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user:'request@alpharenovation.co.uk',
+                pass: 'london2014'
+            }
+
+        });
+        const mailOptions = {
+            from: '"Website contact" <request@alpharenovation.co.uk> ',
+            to: 'alpharenovation13@gmail.com',
+            subject: 'New message from contact from alpharenovation.co.uk',
+            html: output,
+            headers:{'My-Custom-header' : 'header value'},
+            date: new Date()
+        };
+
+    transporter.sendMail( mailOptions, function (error, message, info) {
+        if(!error){
+            console.log('Message sent: %s', info.messageId);
+            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            console.log(nodemailer.getTestMessageUrl(info));
+
+            res.render('contact_send',{
+                flash :  {messages : message},
+                pageTitle: 'Please get in contact with us',
+                errors: error
+            });
+        } else{
+            res.render('contact',{
+                flash :  {errors : error},
+                pageTitle: 'Please get in contact with us',
+                errors: error
+            });
+
+        }
     });
 
 });
@@ -132,11 +251,13 @@ app.post('/contact/send', validationForm, function (req, res) {
 app.use(function(err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.status(err.status || 500);    // render the error page
-    res.render('error');
+    res.status(err.status || 500);
+    if(err && err.length >0){
+        res.send(err);
+    }
 });
 
-app.listen(9080, function () {
+app.listen(PORT, function () {
     console.log('hey');
 });
 
