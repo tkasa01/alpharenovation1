@@ -37,8 +37,6 @@
                         <% flash.errors.forEach(function(error){ %>
                             <li style="color:red"><%= error.messages %></li>
                          <% }) %>
-                    <%} if(flash.messages !== null && typeof flash.messages  !== 'undefined'){%>
-                            <p style="color:darkseagreen"><%= flash.messages %></p>
                     <%} %>
                 </ul>
                 <form  id="form-id" class="quote" method="POST" action="send">
