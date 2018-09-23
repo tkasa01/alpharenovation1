@@ -61,38 +61,6 @@ app.use(expressValidator({
     }
 }));
 
-/*
-app.get('/index', function (req, res) {
-   res.render('index',{
-       pageTitle: 'Alpha Renovation Company'
-   });
-});
-
-app.get('/about', function (req, res) {
-    res.render('about',{
-        pageTitle: 'About Us'
-    });
-});
-
-app.get('/services', function (req, res) {
-    res.render('services',{
-        pageTitle: 'Our Services'
-    });
-});
-
-app.get('/contact', function (req, res) {
-        res.render('contact',{
-            pageTitle: 'Please get in contact with us'
-        });
-
-});
-
-app.get('/portfolio', function (req, res) {
-    res.render('portfolio',{
-        pageTitle: 'Our Portfolio'
-    })
-});*/
-
 function validationForm(req, res, next) {
 
          req.checkBody('fullName', 'Name is Required').notEmpty();
@@ -172,7 +140,7 @@ app.use(function(err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
-    if(err && err.length >0){
+    if(err && err.length > 0){
         res.send(err);
     }
 });
