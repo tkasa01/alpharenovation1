@@ -6,7 +6,7 @@ const flash = require('connect-flash');
 const path  = require('path');
 const Promise = require('promise');
 const expressValidator = require('express-validator');
-
+const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
 
@@ -42,7 +42,7 @@ app.use(function (req, res, next) {
     };
     next();
 });
-
+app.use('/', api);
 //express validator
 app.use(expressValidator({
     errorFormatter:function (param, message, error, value){
@@ -61,7 +61,7 @@ app.use(expressValidator({
     }
 }));
 
-
+/*
 app.get('/index', function (req, res) {
    res.render('index',{
        pageTitle: 'Alpha Renovation Company'
@@ -91,7 +91,7 @@ app.get('/portfolio', function (req, res) {
     res.render('portfolio',{
         pageTitle: 'Our Portfolio'
     })
-});
+});*/
 
 function validationForm(req, res, next) {
 
@@ -150,9 +150,6 @@ app.post('/send', validationForm, function (req, res) {
     transporter.sendMail( mailOptions, function (error, message, info) {
         if(!error){
             console.log('Message sent: %s', info.messageId);
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            console.log(nodemailer.getTestMessageUrl(info));
-
             res.render('contact_send',{
                 flash :  {messages : message},
                 pageTitle: 'Please get in contact with us',
