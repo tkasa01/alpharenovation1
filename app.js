@@ -8,6 +8,11 @@ const Promise = require('promise');
 const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
+const SparkPost = require('sparkpost');
+const sp = new SparkPost();
+
+const sparkPostTransport = require('nodemailer-sparkpost-transport');
+const transporter = nodemailer.createTransport(sparkPostTransport(process.env.SPARKPOST_API_KEY));
 
 
 const $ = require("jquery");
@@ -34,6 +39,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(flash());
+
+
 
 app.use(function (req, res, next) {
     res.locals.flash = {
@@ -62,13 +69,10 @@ app.use(expressValidator({
 }));
 
 function validationForm(req, res, next) {
-
          req.checkBody('fullName', 'Name is Required').notEmpty();
          req.checkBody('email', 'Email is Required').notEmpty();
          req.checkBody('text', 'Message is Required').notEmpty();
-
         let error = (req.validationErrors());
-
         if (error) {
             res.render('contact', {
                 pageTitle: 'Please get in contact with us',
@@ -76,7 +80,6 @@ function validationForm(req, res, next) {
             })
         }
         res.render('contact_send', {
-        //res.render('contact', {
             pageTitle: 'Thank you for contacting us.',
             flash:{messages: 'Thank you for contacting us. We will get back to you as soon as we can.'}
          });
@@ -84,9 +87,14 @@ function validationForm(req, res, next) {
         next();
 }
 
+app.get("/", function (req, res, next) {
+    Promise.resolve().then(function () {
+        throw new Error("BROKEN");
+    }).catch(next); // Errors will be passed to Express.
+});
 app.post('/send', validationForm, function (req, res) {
 
-        const output  = `<p>You have a new contact message</p>
+    const output  = `<p>You have a new contact message</p>
                          <h3>Contact Details</h3>
                          <ul>
                          <li>Name:          ${req.body.name}</li>
@@ -96,24 +104,27 @@ app.post('/send', validationForm, function (req, res) {
                          </ul>`;
 
 
-        const transporter = nodemailer.createTransport({
-            host: 'box5231.bluehost.com',
-            port: 465,
-            secure: true,
-            auth: {
-                user:'request@alpharenovation.co.uk',
-                pass: 'london2014'
-            }
+    const transporter = nodemailer.createTransport({
 
-        });
-        const mailOptions = {
-            from: '"Website contact" <request@alpharenovation.co.uk> ',
-            to: 'alpharenovation13@gmail.com',
-            subject: 'New message from contact from alpharenovation.co.uk',
-            html: output,
-            headers:{'My-Custom-header' : 'header value'},
-            date: new Date()
-        };
+        url:'https://api.sparkpost.com/api/v1',
+        host:'smtp.sparkpostmail.com',
+        port: 587,
+        secure: true,
+        auth: {
+            user:'SMTP_Injection',
+            pass: 'd0ae8bcca3ad7881a2f73b01465fa75de5079084'
+        }
+
+    });
+    const mailOptions = {
+        from: '"Website contact" <young-temple-62524@sparkpostbox.com>',
+        //from: '"Website contact" <request@alpharenovation.co.uk> ',
+        to: 'alpharenovation13@gmail.com',
+        subject: 'New message from contact from alpharenovation.co.uk',
+        html: output,
+        headers:{'My-Custom-header' : 'header value'},
+        date: new Date()
+    };
 
     transporter.sendMail( mailOptions, function (error, message, info) {
         if(!error){
@@ -134,6 +145,7 @@ app.post('/send', validationForm, function (req, res) {
     });
 
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
