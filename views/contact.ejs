@@ -34,9 +34,9 @@
                 <h3>Contact Us By Email</h3>
                 <ul>
                     <% if(flash.errors !== null && typeof flash.errors  !== 'undefined'){%>
-                        <% flash.errors.forEach(function(error){ %>
-                            <li style="color:red"><%= error.messages %></li>
-                         <% }) %>
+                            <% for(var error in flash.errors){ %>
+                                <li style="color:red"><%= flash.errors.hasOwnProperty(error) %></li>
+                            <%}%>
                     <%} %>
                 </ul>
                 <form  id="form-id" class="quote" method="POST" action="send">
