@@ -35,7 +35,7 @@
                 <ul>
                     <% if(flash.errors !== null && typeof flash.errors  !== 'undefined'){%>
                             <% for(var error in flash.errors){ %>
-                                <li style="color:red"><%= flash.errors.hasOwnProperty(error) %></li>
+                                <li style="color:red"><%= flash.errors[error] %></li>
                             <%}%>
                     <%} %>
                 </ul>
