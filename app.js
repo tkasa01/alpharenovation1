@@ -8,12 +8,6 @@ const Promise = require('promise');
 const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
-const SparkPost = require('sparkpost');
-const sp = new SparkPost();
-
-const sparkPostTransport = require('nodemailer-sparkpost-transport');
-const transporter = nodemailer.createTransport(sparkPostTransport(process.env.SPARKPOST_API_KEY));
-
 
 const $ = require("jquery");
 
@@ -25,7 +19,7 @@ app.locals.siteTitle = 'Alpha Renovation';
 
 app.engine('ejs', require('ejs').renderFile);
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); //'./views
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(cookieParser('bordeyltd'));
 app.use(session({
@@ -39,8 +33,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(flash());
-
-
 
 app.use(function (req, res, next) {
     res.locals.flash = {
@@ -68,87 +60,91 @@ app.use(expressValidator({
     }
 }));
 
-function validationForm(req, res, next) {
-         req.checkBody('fullName', 'Name is Required').notEmpty();
-         req.checkBody('email', 'Email is Required').notEmpty();
-         req.checkBody('text', 'Message is Required').notEmpty();
-        let error = (req.validationErrors());
-        if (error) {
-            res.render('contact', {
-                pageTitle: 'Please get in contact with us',
-                flash:{ errors: error}
-            })
-        }
-        res.render('contact_send', {
-            pageTitle: 'Thank you for contacting us.',
-            flash:{messages: 'Thank you for contacting us. We will get back to you as soon as we can.'}
-         });
+function validateForm(req) {
+    return new Promise((resolve,reject) => {
 
-        next();
+        req.checkBody('fullName', 'Name is Required').notEmpty();
+        req.checkBody('email', 'Email is Required').notEmpty();
+        req.checkBody('text', 'Message is Required').notEmpty();
+
+        let validationErrors = (req.validationErrors());
+        let errors = [];
+
+        if (validationErrors) {
+            validationErrors.forEach(error => {
+                errors.push(error.messages);
+            });
+            console.log(errors);
+            reject(errors);
+
+        }else{
+            resolve();
+        }
+
+    });
 }
 
-app.get("/", function (req, res, next) {
-    Promise.resolve().then(function () {
-        throw new Error("BROKEN");
-    }).catch(next); // Errors will be passed to Express.
-});
-app.post('/send', validationForm, function (req, res) {
-
-    const output  = `<p>You have a new contact message</p>
+app.post('/send', function (req, res) {
+    validateForm(req)
+        .then(() => {
+            const output  = `<p>You have a new contact message</p>
                          <h3>Contact Details</h3>
                          <ul>
                          <li>Name:          ${req.body.name}</li>
                          <li>Email: email:  ${req.body.email}</li>
-                         <h3>Message</h3>
                          <li>Message:       ${req.body.text}</li>
-                         </ul>`;
+                         </ul>
+                         <h3>Message</h3>
+                         <p>${req.body.message}</p>`;
 
+            let transporter = nodemailer.createTransport({
+                host: 'box5231.bluehost.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    user:'request@alpharenovation.co.uk',
+                    pass: 'london2014'
+                }
 
-    const transporter = nodemailer.createTransport({
-
-        url:'https://api.sparkpost.com/api/v1',
-        host:'smtp.sparkpostmail.com',
-        port: 587,
-        secure: true,
-        auth: {
-            user:'SMTP_Injection',
-            pass: 'd0ae8bcca3ad7881a2f73b01465fa75de5079084'
-        }
-
-    });
-    const mailOptions = {
-        from: '"Website contact" <young-temple-62524@sparkpostbox.com>',
-        //from: '"Website contact" <request@alpharenovation.co.uk> ',
-        to: 'alpharenovation13@gmail.com',
-        subject: 'New message from contact from alpharenovation.co.uk',
-        html: output,
-        headers:{'My-Custom-header' : 'header value'},
-        date: new Date()
-    };
-
-    transporter.sendMail( mailOptions, function (error, message, info) {
-        if(!error){
-            console.log('Message sent: %s', info.messageId);
-            res.render('contact_send',{
-                flash :  {messages : message},
-                pageTitle: 'Please get in contact with us',
-                errors: error
             });
-        } else{
-            res.render('contact',{
-                flash :  {errors : error},
-                pageTitle: 'Please get in contact with us',
-                errors: error
+            let mailOptions = {
+                from: '"Website contact" <request@alpharenovation.co.uk> ',
+                to: 'alpharenovation13@gmail.com',
+                subject: 'New message from contact from alpharenovation.co.uk',
+                html: output,
+                headers:{'My-Custom-header' : 'header value'},
+                date: new Date()
+            };
+
+            transporter.sendMail( mailOptions, function (error, message) {
+                    message = 'Thank you for your email. We will contact with you as soon as possible.';
+                if(message){
+                    res.render('contact_send',{
+                        flash :  {messages : message},
+                        pageTitle: 'Thank you',
+                        messages:message
+                    });
+                } else{
+                    res.render('contact',{
+                        flash :  {errors : error},
+                        pageTitle: 'Please get in contact with us',
+                        errors: error
+                    });
+                }
             });
-
-        }
-    });
-
+        })
+        .catch(errors => {
+            res.render('contact', {
+                pageTitle: 'Please get in contact with us',
+                flash:{ errors: errors}
+            });
+        });
 });
 
 
+
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
@@ -160,5 +156,7 @@ app.use(function(err, req, res, next) {
 app.listen(PORT, function () {
     console.log('hey');
 });
+
+
 
 
