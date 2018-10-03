@@ -19,7 +19,9 @@
     "jquery": "^3.3.1",
     "mail-preview": "0.0.3",
     "nodemailer": "^4.6.6",
+    "nodemailer-sparkpost-transport": "^2.1.0",
     "promise": "^8.0.2",
+    "sparkpost": "^2.1.2",
     "typescript": "^2.9.2"
   }
 }

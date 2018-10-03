@@ -1,2 +1,293 @@
 To open console : nodemon
 for the browser: localhost:9080
+
+
+
+/*
+ app.post('/send',  validationForm, function (req, res) {
+ const recipients  = `<p>You have a new contact message</p>
+ <h3>Contact Details</h3>
+ <ul>
+ <li>Name:          ${req.body.name}</li>
+ <li>Email: email:  ${req.body.email}</li>
+ <h3>Message</h3>
+ <li>Message:       ${req.body.text}</li>
+ </ul>`;
+ recipients.forEach(function (val, index) {
+ output[index] = {address:val};
+ })
+
+ const transporter = nodemailer.createTransport({
+ //host: 'ns13.domaincontrol.com',
+ host:'smtp.sparkpostmail.com',
+ port: 587,
+ secure: true,
+ auth: {
+ user:'request@alpharenovation.co.uk',
+ pass: 'london2014'
+ }
+
+ });
+ sp.transmissions.send({
+ transmissionBody:{
+ content:{
+ from: '"Website contact" <heroku-node-js-example@young-temple-62524.com> ',
+ to: 'alpharenovation13@gmail.com',
+ subject: 'New message from contact from alpharenovation.co.uk',
+ html: recipients,
+ headers:{'My-Custom-header' : 'header value'},
+ date: new Date()
+ },
+ recipients:recipients
+ }
+ },function (err, apiResponse) {
+ if(!err){
+ console.log('Message sent: %s', info.messageId);
+ res.render('contact_send',{
+ flash :  {messages : apiResponse},
+ pageTitle: 'Please get in contact with us',
+ errors: error
+ });
+ } else{
+ res.render('contact',{
+ flash :  {errors : error},
+ pageTitle: 'Please get in contact with us',
+ errors: error
+ });
+
+ }
+ });
+ });*/
+
+
+/*
+ app.post('/send', validationForm, function (req, res) {
+
+ const output  = `<p>You have a new contact message</p>
+ <h3>Contact Details</h3>
+ <ul>
+ <li>Name:          ${req.body.name}</li>
+ <li>Email: email:  ${req.body.email}</li>
+ <h3>Message</h3>
+ <li>Message:       ${req.body.text}</li>
+ </ul>`;
+
+
+ const transporter = nodemailer.createTransport({
+ //host: 'ns13.domaincontrol.com',
+ host:'smtp.alpharenovation.co.uk',
+ port: 465,
+ secure: true,
+ auth: {
+ user:'request@alpharenovation.co.uk',
+ pass: 'london2014'
+ }
+
+ });
+ const mailOptions = {
+ from: '"Website contact" <request@alpharenovation.co.uk> ',
+ to: 'alpharenovation13@gmail.com',
+ subject: 'New message from contact from alpharenovation.co.uk',
+ html: output,
+ headers:{'My-Custom-header' : 'header value'},
+ date: new Date()
+ };
+
+ transporter.sendMail( mailOptions, function (error, message, info) {
+ if(!error){
+ console.log('Message sent: %s', info.messageId);
+ res.render('contact_send',{
+ flash :  {messages : message},
+ pageTitle: 'Please get in contact with us',
+ errors: error
+ });
+ } else{
+ res.render('contact',{
+ flash :  {errors : error},
+ pageTitle: 'Please get in contact with us',
+ errors: error
+ });
+
+ }
+ });
+
+ });*/
+
+ =============
+  const express = require('express');
+  const session = require('express-session');
+  const cookieParser = require('cookie-parser');
+  const bodyParser = require('body-parser');
+  const flash = require('connect-flash');
+  const path  = require('path');
+  const Promise = require('promise');
+  const expressValidator = require('express-validator');
+  const api = require('./api/router');
+  const nodemailer = require('nodemailer');
+
+
+  const $ = require("jquery");
+
+  const PORT = process.env.PORT || 9080;
+  const app = express();
+
+
+  app.locals.siteTitle = 'Alpha Renovation';
+
+  app.engine('ejs', require('ejs').renderFile);
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views')); //'./views
+
+  app.use(cookieParser('bordeyltd'));
+  app.use(session({
+      cookie: {maxAge: 6000},
+      secret: 'secr6783',
+      saveUninitialized: true,
+      resave: true
+  }));
+
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+  app.use('/public', express.static(path.join(__dirname, 'public')));
+  app.use(flash());
+
+  app.use(function (req, res, next) {
+      res.locals.flash = {
+          messages :req.flash('messages'),
+          errors: req.flash('errors')
+      };
+      next();
+  });
+  app.use('/', api);
+  //express validator
+  app.use(expressValidator({
+      errorFormatter:function (param, message, error, value){
+          let namespace = param.split('.'),
+              root = namespace.shift(),
+              formParam = root;
+          while(namespace.length){
+              formParam += '[' + namespace.shift() + ']';
+          }
+          return{
+              param: formParam,
+              messages: message,
+              errors: error,
+              value: value
+          };
+      }
+  }));
+
+  /*
+  app.get('/index', function (req, res) {
+     res.render('index',{
+         pageTitle: 'Alpha Renovation Company'
+     });
+  });
+  app.get('/about', function (req, res) {
+      res.render('about',{
+          pageTitle: 'About Us'
+      });
+  });
+  app.get('/services', function (req, res) {
+      res.render('services',{
+          pageTitle: 'Our Services'
+      });
+  });
+  app.get('/contact', function (req, res) {
+          res.render('contact',{
+              pageTitle: 'Please get in contact with us'
+          });
+  });
+  app.get('/portfolio', function (req, res) {
+      res.render('portfolio',{
+          pageTitle: 'Our Portfolio'
+      })
+  });*/
+
+  function validationForm(req, res, next) {
+
+           req.checkBody('fullName', 'Name is Required').notEmpty();
+           req.checkBody('email', 'Email is Required').notEmpty();
+           req.checkBody('text', 'Message is Required').notEmpty();
+
+          let error = (req.validationErrors());
+
+          if (error) {
+              res.render('contact', {
+                  pageTitle: 'Please get in contact with us',
+                  flash:{ errors: error}
+              })
+          }
+          res.render('contact_send', {
+          //res.render('contact', {
+              pageTitle: 'Thank you for contacting us.',
+              flash:{messages: 'Thank you for contacting us. We will get back to you as soon as we can.'}
+           });
+
+          next();
+  }
+
+  app.post('/send', validationForm, function (req, res) {
+
+          const output  = `<p>You have a new contact message</p>
+                           <h3>Contact Details</h3>
+                           <ul>
+                           <li>Name:          ${req.body.name}</li>
+                           <li>Email: email:  ${req.body.email}</li>
+                           <h3>Message</h3>
+                           <li>Message:       ${req.body.text}</li>
+                           </ul>`;
+
+
+          const transporter = nodemailer.createTransport({
+              host: 'box5231.bluehost.com',
+              port: 465,
+              secure: true,
+              auth: {
+                  user:'request@alpharenovation.co.uk',
+                  pass: 'london2014'
+              }
+
+          });
+          const mailOptions = {
+              from: '"Website contact" <request@alpharenovation.co.uk> ',
+              to: 'alpharenovation13@gmail.com',
+              subject: 'New message from contact from alpharenovation.co.uk',
+              html: output,
+              headers:{'My-Custom-header' : 'header value'},
+              date: new Date()
+          };
+
+      transporter.sendMail( mailOptions, function (error, message, info) {
+          if(!error){
+              console.log('Message sent: %s', info.messageId);
+              res.render('contact_send',{
+                  flash :  {messages : message},
+                  pageTitle: 'Please get in contact with us',
+                  errors: error
+              });
+          } else{
+              res.render('contact',{
+                  flash :  {errors : error},
+                  pageTitle: 'Please get in contact with us',
+                  errors: error
+              });
+
+          }
+      });
+
+  });
+
+  // error handler
+  app.use(function(err, req, res, next) {
+      res.locals.message = err.message;
+      res.locals.error = req.app.get('env') === 'development' ? err : {};
+      res.status(err.status || 500);
+      if(err && err.length >0){
+          res.send(err);
+      }
+  });
+
+  app.listen(PORT, function () {
+      console.log('hey');
+  });
