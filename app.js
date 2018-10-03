@@ -94,65 +94,7 @@ function validateForm(req) {
     });
 }
 
-app.post('/send', function (req, res) {
-    validateForm(req)
-        .then(() => {
-            const output  = `<p>You have a new contact message</p>
-                         <h3>Contact Details</h3>
-                         <ul>
-                         <li>Name:          ${req.body.name}</li>
-                         <li>Email: email:  ${req.body.email}</li>
-                         <li>Message:       ${req.body.text}</li>
-                         </ul>
-                         <h3>Message</h3>
-                         <p>${req.body.message}</p>`;
 
-            let transporter = nodemailer.createTransport({
-                host: 'smtp.eu.sparkpostmail.com',
-                port: 587,
-                alternative : 2525,
-                secure: true,
-                encryption: 'STARTTLS',
-                auth: {
-                    user:'SMTP_Injection',
-                    pass: 'ku'
-                }
-
-            });
-            let mailOptions = {
-                from: '"Website contact" <request@alpharenovation.co.uk> ',
-                to: 'alpharenovation13@gmail.com',
-                subject: 'New message from contact from alpharenovation.co.uk',
-                html: output,
-                headers:{'My-Custom-header' : 'header value'},
-                date: new Date()
-            };
-
-            transporter.sendMail( mailOptions, function (error, message) {
-                message = 'Thank you for your email. We will contact with you as soon as possible.';
-                if(message){
-                    res.render('contact_send',{
-                        flash :  {messages : message},
-                        pageTitle: 'Thank you',
-                        messages:message
-                    });
-                } else{
-                    res.render('contact',{
-                        flash :  {errors : error},
-                        pageTitle: 'Please get in contact with us',
-                        errors: error
-                    });
-                }
-            });
-        })
-        .catch(error => {
-            res.render('contact', {
-                pageTitle: 'Please get in contact with us',
-                flash:{ errors: error}
-            });
-        });
-});
-/*
 app.post('/send', function (req, res) {
     validateForm(req)
         .then(() => {
@@ -209,7 +151,7 @@ app.post('/send', function (req, res) {
             });
         });
 });
-*/
+
 
 // error handler
 app.use(function(err, req, res, next) {
