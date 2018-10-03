@@ -9,9 +9,17 @@ const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
+
+
+//const API_KEY="b3d5c4cf3432d7f7cf542dbc5d1ee9f2ff06654d";
+//const SparkPost = require('sparkpost');
+//const client = new SparkPost(process.env.SPARKPOST_API_KEY);
+
+
+
 const $ = require("jquery");
 
-const PORT = process.env.PORT || 9080;
+const PORT = process.env.PORT || 5000;
 const app = express();
 
 
@@ -69,6 +77,8 @@ function validateForm(req) {
 
         let validationErrors = (req.validationErrors());
         let errors = [];
+       // let message = 'Thank you for your email. We will contact with you as soon as possible.';
+       // let message = ' ';
 
         if (validationErrors) {
             validationErrors.forEach(error => {
@@ -84,6 +94,65 @@ function validateForm(req) {
     });
 }
 
+app.post('/send', function (req, res) {
+    validateForm(req)
+        .then(() => {
+            const output  = `<p>You have a new contact message</p>
+                         <h3>Contact Details</h3>
+                         <ul>
+                         <li>Name:          ${req.body.name}</li>
+                         <li>Email: email:  ${req.body.email}</li>
+                         <li>Message:       ${req.body.text}</li>
+                         </ul>
+                         <h3>Message</h3>
+                         <p>${req.body.message}</p>`;
+
+            let transporter = nodemailer.createTransport({
+                host: 'smtp.eu.sparkpostmail.com',
+                port: 587,
+                alternative : 2525,
+                secure: true,
+                encryption: 'STARTTLS',
+                auth: {
+                    user:'SMTP_Injection',
+                    pass: 'ku'
+                }
+
+            });
+            let mailOptions = {
+                from: '"Website contact" <request@alpharenovation.co.uk> ',
+                to: 'alpharenovation13@gmail.com',
+                subject: 'New message from contact from alpharenovation.co.uk',
+                html: output,
+                headers:{'My-Custom-header' : 'header value'},
+                date: new Date()
+            };
+
+            transporter.sendMail( mailOptions, function (error, message) {
+                message = 'Thank you for your email. We will contact with you as soon as possible.';
+                if(message){
+                    res.render('contact_send',{
+                        flash :  {messages : message},
+                        pageTitle: 'Thank you',
+                        messages:message
+                    });
+                } else{
+                    res.render('contact',{
+                        flash :  {errors : error},
+                        pageTitle: 'Please get in contact with us',
+                        errors: error
+                    });
+                }
+            });
+        })
+        .catch(error => {
+            res.render('contact', {
+                pageTitle: 'Please get in contact with us',
+                flash:{ errors: error}
+            });
+        });
+});
+/*
 app.post('/send', function (req, res) {
     validateForm(req)
         .then(() => {
@@ -117,10 +186,10 @@ app.post('/send', function (req, res) {
             };
 
             transporter.sendMail( mailOptions, function (error, message) {
-                    message = 'Thank you for your email. We will contact with you as soon as possible.';
+                message = 'Thank you for your email. We will contact with you as soon as possible.';
                 if(message){
                     res.render('contact_send',{
-                        flash :  {messages : message},
+                       flash :  {messages : message},
                         pageTitle: 'Thank you',
                         messages:message
                     });
@@ -133,24 +202,24 @@ app.post('/send', function (req, res) {
                 }
             });
         })
-        .catch(errors => {
+        .catch(error => {
             res.render('contact', {
                 pageTitle: 'Please get in contact with us',
-                flash:{ errors: errors}
+                flash:{ errors: error}
             });
         });
 });
-
-
+*/
 
 // error handler
-app.use(function(err, req, res) {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function(err, req, res, next) {
+    res.locals.messages = err.messages;
+    res.locals.errors = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
     if(err && err.length > 0){
         res.send(err);
     }
+    next();
 });
 
 app.listen(PORT, function () {
