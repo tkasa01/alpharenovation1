@@ -10,16 +10,20 @@ const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
 
+//const SPARKPOST_API_KEY = "ec4b05131a5e0df2e95a719b7074f32afd4aa08f";
 
-//const API_KEY="b3d5c4cf3432d7f7cf542dbc5d1ee9f2ff06654d";
-//const SparkPost = require('sparkpost');
-//const client = new SparkPost(process.env.SPARKPOST_API_KEY);
+const SparkPost = require('sparkpost');
+const client = new SparkPost();
 
-
+//process.env.SPARKPOST_API_KEY
 
 const $ = require("jquery");
 
-const PORT = process.env.PORT || 5000;
+let port =  process.env.PORT;
+if (port == null || port == "") {
+    port = 5000;
+}
+
 const app = express();
 
 
@@ -95,6 +99,7 @@ function validateForm(req) {
 }
 
 
+
 app.post('/send', function (req, res) {
     validateForm(req)
         .then(() => {
@@ -164,7 +169,7 @@ app.use(function(err, req, res, next) {
     next();
 });
 
-app.listen(PORT, function () {
+app.listen(port, function () {
     console.log('hey');
 });
 
