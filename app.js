@@ -9,11 +9,8 @@ const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
-
-//const SPARKPOST_API_KEY = "ec4b05131a5e0df2e95a719b7074f32afd4aa08f";
-
 const SparkPost = require('sparkpost');
-const client = new SparkPost();
+const client = new SparkPost('<YOUR API KEY>');
 
 //process.env.SPARKPOST_API_KEY
 
@@ -114,17 +111,20 @@ app.post('/send', function (req, res) {
                          <p>${req.body.message}</p>`;
 
             let transporter = nodemailer.createTransport({
-                host: 'box5231.bluehost.com',
-                port: 465,
+                host: 'smtp.eu.sparkpostmail.com',
+                port: 587,
+                alternative : 2525,
+                encryption:	'STARTTLS',
+                authentication: 'AUTH LOGIN',
                 secure: true,
                 auth: {
-                    user:'request@alpharenovation.co.uk',
-                    pass: 'london2014'
+                    user:'SMTP_Injection',
+                    pass: 'API_KEY'
                 }
 
             });
             let mailOptions = {
-                from: '"Website contact" <request@alpharenovation.co.uk> ',
+                from: '"Website contact" <request.alpharenovation.co.uk> ',
                 to: 'alpharenovation13@gmail.com',
                 subject: 'New message from contact from alpharenovation.co.uk',
                 html: output,
