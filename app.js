@@ -12,7 +12,6 @@ const nodemailer = require('nodemailer');
 const SparkPost = require('sparkpost');
 const client = new SparkPost('<YOUR API KEY>');
 
-//process.env.SPARKPOST_API_KEY
 
 const $ = require("jquery");
 
