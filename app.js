@@ -9,8 +9,8 @@ const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
-const SparkPost = require('sparkpost');
-const client = new SparkPost('<YOUR API KEY>');
+//const SparkPost = require('sparkpost');
+//const client = new SparkPost('<YOUR API KEY>');
 
 
 const $ = require("jquery");
@@ -94,8 +94,6 @@ function validateForm(req) {
     });
 }
 
-
-
 app.post('/send', function (req, res) {
     validateForm(req)
         .then(() => {
@@ -110,20 +108,19 @@ app.post('/send', function (req, res) {
                          <p>${req.body.message}</p>`;
 
             let transporter = nodemailer.createTransport({
-                host: 'smtp.eu.sparkpostmail.com',
+                host: 'smtp.gmail.com',
                 port: 587,
-                alternative : 2525,
-                encryption:	'STARTTLS',
-                authentication: 'AUTH LOGIN',
                 secure: true,
+                //TLS: ON,
                 auth: {
-                    user:'SMTP_Injection',
-                    pass: 'API_KEY'
+                    user:'request@alpharenovation.co.uk',
+                    pass: 'london2014'
                 }
 
             });
             let mailOptions = {
-                from: '"Website contact" <request.alpharenovation.co.uk> ',
+                from: '"Website contact" <pop.gmail.com>',
+                //from: '"Website contact" <request.alpharenovation.co.uk> ',
                 to: 'alpharenovation13@gmail.com',
                 subject: 'New message from contact from alpharenovation.co.uk',
                 html: output,
@@ -139,12 +136,14 @@ app.post('/send', function (req, res) {
                         pageTitle: 'Thank you',
                         messages:message
                     });
+                    console.log("tanks");
                 } else{
                     res.render('contact',{
                         flash :  {errors : error},
                         pageTitle: 'Please get in contact with us',
                         errors: error
                     });
+                    console.log("error");
                 }
             });
         })
@@ -153,6 +152,7 @@ app.post('/send', function (req, res) {
                 pageTitle: 'Please get in contact with us',
                 flash:{ errors: error}
             });
+            console.log(error);
         });
 });
 
