@@ -119,8 +119,8 @@ app.post('/send', function (req, res) {
 
             });
             let mailOptions = {
-                from: '"Website contact" <pop.gmail.com>',
-                //from: '"Website contact" <request.alpharenovation.co.uk> ',
+                //from: '"Website contact" <pop.gmail.com>',
+                from: '"Website contact" <request.alpharenovation.co.uk> ',
                 to: 'alpharenovation13@gmail.com',
                 subject: 'New message from contact from alpharenovation.co.uk',
                 html: output,
