@@ -4,20 +4,17 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
 const path  = require('path');
+const dotenv = require('dotenv').config({path:'./.env'});
 const Promise = require('promise');
 const expressValidator = require('express-validator');
 const api = require('./api/router');
 const nodemailer = require('nodemailer');
 
-//const SparkPost = require('sparkpost');
-//const client = new SparkPost('<YOUR API KEY>');
-
-
 const $ = require("jquery");
 
 let port =  process.env.PORT;
 if (port == null || port == "") {
-    port = 5000;
+    port = process.env.PORT;
 }
 
 const app = express();
@@ -32,9 +29,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(cookieParser('bordeyltd'));
 app.use(session({
     cookie: {maxAge: 6000},
-    secret: 'secr6783',
-    saveUninitialized: true,
-    resave: true
+    secret: process.env.COOKIE_SECRET,
+    saveUninitialized: process.env.COOKIE_SAVEUNINITIAALIZED,
+    resave: process.env.COOKIE_RESAVE
 }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -77,9 +74,6 @@ function validateForm(req) {
 
         let validationErrors = (req.validationErrors());
         let errors = [];
-       // let message = 'Thank you for your email. We will contact with you as soon as possible.';
-       // let message = ' ';
-
         if (validationErrors) {
             validationErrors.forEach(error => {
                 errors.push(error.messages);
@@ -100,28 +94,25 @@ app.post('/send', function (req, res) {
             const output  = `<p>You have a new contact message</p>
                          <h3>Contact Details</h3>
                          <ul>
-                         <li>Name:          ${req.body.name}</li>
+                         <li>Name:          ${req.body.fullName}</li>
                          <li>Email: email:  ${req.body.email}</li>
-                         <li>Message:       ${req.body.text}</li>
-                         </ul>
-                         <h3>Message</h3>
-                         <p>${req.body.message}</p>`;
+                          <h3>Message</h3>
+                         <p>Message:       ${req.body.text}</p>
+                         </ul>`;
 
             let transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 587,
-                secure: true,
-                //TLS: ON,
+                host: process.env.MAIL_HOST,
+                port: process.env.MAIL_PORT,
+                secure: process.env.MAIL_SECURE,
                 auth: {
-                    user:'request@alpharenovation.co.uk',
-                    pass: 'london2014'
+                    user:process.env.MAIL_USER,
+                    pass: process.env.MAIL_PASS
                 }
-
             });
             let mailOptions = {
-                //from: '"Website contact" <pop.gmail.com>',
-                from: '"Website contact" <request.alpharenovation.co.uk> ',
-                to: 'alpharenovation13@gmail.com',
+                from:'"Website contact"<alpharenovation13@gmail.com>',
+                //from:'"Website contact"<require-01b997@inbox.mailtrap.io>',
+                to: 'alpharenovation13@gmail.com , kasatanya1@gmail.com',
                 subject: 'New message from contact from alpharenovation.co.uk',
                 html: output,
                 headers:{'My-Custom-header' : 'header value'},
@@ -138,12 +129,13 @@ app.post('/send', function (req, res) {
                     });
                     console.log("tanks");
                 } else{
+                    console.log(error);
                     res.render('contact',{
                         flash :  {errors : error},
                         pageTitle: 'Please get in contact with us',
                         errors: error
                     });
-                    console.log("error");
+
                 }
             });
         })
@@ -162,14 +154,16 @@ app.use(function(err, req, res, next) {
     res.locals.messages = err.messages;
     res.locals.errors = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
-    if(err && err.length > 0){
+    if(err && err.length > 0 && dotenv.err){
+        //throw env.err;
         res.send(err);
+
     }
     next();
 });
 
 app.listen(port, function () {
-    console.log('hey');
+    console.log('hey u ' + dotenv.parsed);
 });
 
 
