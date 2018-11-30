@@ -8,7 +8,10 @@ const dotenv = require('dotenv').config({path:'./.env'});
 const Promise = require('promise');
 const expressValidator = require('express-validator');
 const api = require('./api/router');
+
 const nodemailer = require('nodemailer');
+const SparkPost = require('sparkpost');
+const euClient = new SparkPost(process.env.SPARKPOST_API_KEY, {origin: process.env.MAIL_ORIGIN});
 
 const $ = require("jquery");
 
@@ -91,7 +94,7 @@ function validateForm(req) {
 app.post('/send', function (req, res) {
     validateForm(req)
         .then(() => {
-            const output  = `<p>You have a new contact message</p>
+            const output = `<p>You have a new contact message</p>
                          <h3>Contact Details</h3>
                          <ul>
                          <li>Name:          ${req.body.fullName}</li>
@@ -99,31 +102,24 @@ app.post('/send', function (req, res) {
                           <h3>Message</h3>
                          <p>Message:       ${req.body.text}</p>
                          </ul>`;
-
-            let transporter = nodemailer.createTransport({
-                host: process.env.MAIL_HOST,
-                port: process.env.MAIL_PORT,
-                secure: process.env.MAIL_SECURE,
-                auth: {
-                    user:process.env.MAIL_USER,
-                    pass: process.env.MAIL_PASS
-                }
-            });
             let mailOptions = {
-                from:'"Website contact"<alpharenovation13@gmail.com>',
-                //from:'"Website contact"<require-01b997@inbox.mailtrap.io>',
-                to: 'alpharenovation13@gmail.com , kasatanya1@gmail.com',
-                subject: 'New message from contact from alpharenovation.co.uk',
-                html: output,
-                headers:{'My-Custom-header' : 'header value'},
-                date: new Date()
-            };
+                content: {
+                    from: '"Website contact"<request@email.alpharenovation.co.uk>',
+                    subject: 'New message from contact from alpharenovation.co.uk',
+                    html: output,
+                    headers: {'My-Custom-header': 'header value'},
+                    date: new Date()
+                },
+                recipients: [
+                    {address: 'alpharenovation13@gmail.com'}
+                ]
 
-            transporter.sendMail( mailOptions, function (error, message) {
+            };
+            euClient.transmissions.send( mailOptions, function (error, message) {
                 message = 'Thank you for your email. We will contact with you as soon as possible.';
                 if(message){
                     res.render('contact_send',{
-                       flash :  {messages : message},
+                        flash :  {messages : message},
                         pageTitle: 'Thank you',
                         messages:message
                     });
@@ -135,19 +131,19 @@ app.post('/send', function (req, res) {
                         pageTitle: 'Please get in contact with us',
                         errors: error
                     });
-
                 }
-            });
-        })
-        .catch(error => {
-            res.render('contact', {
-                pageTitle: 'Please get in contact with us',
-                flash:{ errors: error}
-            });
-            console.log(error);
-        });
-});
 
+            });
+    }).
+             catch(error => {
+             res.render('contact', {
+             pageTitle: 'Please get in contact with us',
+             flash:{ errors: error}
+             });
+             console.log(error);
+             });
+
+});
 
 // error handler
 app.use(function(err, req, res, next) {
