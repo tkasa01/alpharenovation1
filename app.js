@@ -22,7 +22,6 @@ if (port == null || port == "") {
 
 const app = express();
 
-
 app.locals.siteTitle = 'Alpha Renovation';
 
 app.engine('ejs', require('ejs').renderFile);
@@ -151,8 +150,8 @@ app.use(function(err, req, res, next) {
     res.locals.errors = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
     if(err && err.length > 0 && dotenv.err){
-        //throw env.err;
-        res.send(err);
+      throw env.err;
+        //res.send(err);
 
     }
     next();
