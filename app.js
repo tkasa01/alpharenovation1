@@ -102,6 +102,19 @@ app.post('/send', function (req, res) {
                           <h3>Message</h3>
                          <p>Message:       ${req.body.text}</p>
                          </ul>`;
+
+           /* let transporter = nodemailer.createTransport({
+                host: 'smtp.eu.sparkpostmail.com',
+                port: 587,
+                secure: true,
+                //authentication: AUTHLOGIN,
+
+                auth: {
+                    user:'SMTP_Injection',
+                    pass: process.env.SPARKPOST_API_KEY
+                }
+
+            });*/
             let mailOptions = {
                 content: {
                     from: '"Website contact"<request@email.alpharenovation.co.uk>',
@@ -125,23 +138,24 @@ app.post('/send', function (req, res) {
                     });
                     console.log("tanks");
                 } else{
-                    console.log(error);
                     res.render('contact',{
                         flash :  {errors : error},
                         pageTitle: 'Please get in contact with us',
                         errors: error
                     });
+                    console.log(error);
                 }
 
             });
+            
     }).
-             catch(error => {
-             res.render('contact', {
-             pageTitle: 'Please get in contact with us',
-             flash:{ errors: error}
-             });
+     catch(error => {
+         res.render('contact', {
+            pageTitle: 'Please get in contact with us',
+            flash:{ errors: error}
+          });
              console.log(error);
-             });
+    });
 
 });
 
@@ -151,8 +165,8 @@ app.use(function(err, req, res, next) {
     res.locals.errors = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
     if(err && err.length > 0 && dotenv.err){
-      //throw env.err;
-       res.send(err);
+      throw env.err;
+       //res.send(err);
 
     }
     next();

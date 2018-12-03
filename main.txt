@@ -1,2 +1,14 @@
 To open console : nodemon
 for the browser: localhost:9080
+
+
+
+#Mail 'request@alpharenovation.co.uk''london2014'ec4b05131a5e0df2e95a719b7074f32afd4aa08f
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_SECURE=FALSE
+MAIL_USER=0506404a9be70c
+MAIL_PASS=09eb0229cec86c
+
+MAIL_ENCRYPTION = STARTTLS
+MAIL_AUHTENTICATION = AUTH LOGIN
