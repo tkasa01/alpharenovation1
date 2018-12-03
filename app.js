@@ -49,6 +49,7 @@ app.use(function (req, res, next) {
     next();
 });
 app.use('/', api);
+
 //express validator
 app.use(expressValidator({
     errorFormatter:function (param, message, error, value){
@@ -150,8 +151,8 @@ app.use(function(err, req, res, next) {
     res.locals.errors = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
     if(err && err.length > 0 && dotenv.err){
-      throw env.err;
-        //res.send(err);
+      //throw env.err;
+       res.send(err);
 
     }
     next();
