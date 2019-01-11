@@ -102,32 +102,7 @@ app.post('/send', function (req, res) {
                           <h3>Message</h3>
                          <p>Message:       ${req.body.text}</p>
                          </ul>`;
-/*
-           let transporter = nodemailer.createTransport({
-                host: 'email.alpharenovation.co.uk',
-                port: 587,
-                secure: false,
-                auth: {
-                    user:'request@email.alpharenovation.co.uk',
-                    pass: 'london2014'
-                }
 
-            });
-            let mailOptions = {
-                    from: '"Website contact"<request@email.alpharenovation.co.uk>',
-                    to: 'alpharenovation13@gmail.com',
-                    subject: 'New message from contact from alpharenovation.co.uk',
-                    html: output,
-                    headers: {'My-Custom-header': 'header value'},
-                    date: new Date()
-            };
-            transporter.sendMail(mailOptions,(error, info) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log(info);
-                }
-            });*/
 
             let mailOptions = {
                 content: {
